@@ -1,0 +1,28 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -pthread
+SENSOR_SRC = sensor.c
+SENSOR_EXEC = sensor
+MONITOR_SRC = monitor.c
+MONITOR_EXEC = monitor
+
+all: $(SENSOR_EXEC) $(MONITOR_EXEC)
+
+$(SENSOR_EXEC): $(SENSOR_SRC)
+            $(CC) $(CFLAGS) -o $(SENSOR_EXEC) $(SENSOR_SRC)
+
+$(MONITOR_EXEC): $(MONITOR_SRC)
+            $(CC) $(CFLAGS) -o $(MONITOR_EXEC) $(MONITOR_SRC)
+
+.PHONY: clean run_sensor1 run_sensor2 run_monitor
+
+run_sensor1: $(SENSOR_EXEC)
+            ./$(SENSOR_EXEC) -t 3 -p pipe_Nominal -s 1 -f medidas_temperatura.txt &
+
+run_sensor2: $(SENSOR_EXEC)
+            ./$(SENSOR_EXEC) -s 2 -t 2 -f medidas_ph.txt -p pipe_Nominal &
+
+run_monitor: $(MONITOR_EXEC)
+            ./$(MONITOR_EXEC) -b 20 -t FileTemp.txt -h FilePH.txt -p pipe_Nominal &
+
+clean:
+    rm -f $(SENSOR_EXEC) $(MONITOR_EXEC)
